@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Seg Fault detecion to implement
+
 PROMPT_TO_CLEAN="^$USER@minishell"
 
 GREEN="\033[0;32m"
