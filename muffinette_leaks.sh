@@ -10,7 +10,21 @@ else
   echo -e "${RED}LEAKS !${NC} : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
 fi
 
-# echo "Errors val"
-# echo "fd"
-# echo "childs"
-#
+if [[ ! $(grep -v "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" log/valgrind_output | grep -q "ERROR SUMMARY: ") ]]; then
+  echo -e "${GREEN}NO ERRORS${NC}"
+else
+  echo -e "${RED}ERRORS !${NC} : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
+fi
+
+if [[ ! $(grep -q "ERROR: Some processes were left running at exit." log/valgrind_output) ]]; then
+  echo -e "${GREEN}NO ZOMBIE PROCESS${NC}"
+else
+  echo -e "${RED}ZOMBIE PROCESS !${NC} : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
+fi
+
+if [[ ! $(grep -v "FILE DESCRIPTORS: 3 open (3 std) at exit." log/valgrind_output | grep -q "FILES DESCRIPTORS") ]]; then
+  echo -e "${GREEN}FD CLOSED${NC}"
+else
+  echo -e "${RED}FD OPEN AT EXIT !${NC} : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
+fi
+

@@ -1,14 +1,32 @@
 #!/bin/bash
 
+PROMPT_TO_CLEAN="^$USER@minishell"
+
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
 
-PROMPT_TO_CLEAN="^oelleaum@minishell"
 LEAKS_FLAG=0
 
 if [[ -z $1 ]]; then
-  echo "Usage : ./handy_minishell_tester.sh <cmd1> <cmd2> <cmd3> <cmd4>"
+  echo -e "-----------------------------| Muffinette usage |-----------------------------\n"
+  echo -e "1 : Make sure to have your minishell binary in muffinette's folder"
+  echo -e "2 : Your binary must be named \"minishell\""
+  echo -e "\nYour minishell probably prints its prompt and user input on stdout, bash don't"
+  echo -e "To filter it and compare outputs, edit the first line of muffinette.sh: "
+  echo -e "PROMPT_TO_CLEAN=\"^<your-minishell-prompt>\""
+  echo -e "\n./muffinette.sh <cmd1> <cmd2> <cmd3> <cmd4>"
+  echo "./muffinette.sh \"<cmd1> <args>\" <cmd2> <cmd3> <cmd4>"
+  echo "./muffinette.sh \"<cmd1> <args> | <cmd2> <args>\" <cmd3> <cmd4>"
+  echo -e "\nflags :"
+  echo "./muffinette.sh --leaks <cmd1> <cmd2> <cmd3> <cmd4>"
+  echo "./muffinette.sh --clean"
+  echo -e "\nUse log/infile and log/outfile to test redirections"
+  echo -e "./muffinette.sh -r <cmd1> \"<cmd2> <args> > log/outfile\""
+  echo -e "\nSeveral tests as here_doc and quotes management must be done manualy"
+  echo -e "Some commands such as export and env will always display different outputs"
+  # log/infile to implement
+  # # input redir to implement
   exit 1
 fi
 
@@ -22,25 +40,30 @@ if [[ $1 == "--leaks" ]]; then
   shift
 fi
 
-if [[ $1 == "clean" ]]; then
+if [[ $1 == "-r" ]]; then
+  REDIR=1;
+  shift
+fi
+
+if [[ $1 == "-ra" ]]; then
+  REDIR_A=1;
+  shift
+fi
+
+if [[ $1 == "--clean" ]]; then
   rm -rd log
   exit 1
 fi
 
-url="https://profile.intra.42.fr/users/jlacaze-"
-text="jlacaze-"
-
+# Johann working on ...
 if [[ $1 == "--muffin" ]]; then
   echo "error: bakery not implemented yet"
-  echo -e "waiting pull request from \e]8;;${url}\a${text}\e]8;;\a"
   exit 1
 fi
 
-# ajouter une option :
-#   checker Leaks ou pas (plus rapide sans)
-#   chercher un executable a l'endroit ou on se trouve
-
 mkdir -p log
+touch log/outfile
+touch log/infile
 
 INPUT=$(printf "%s\n" "$@")
 
@@ -55,8 +78,6 @@ $INPUT
 EOF
 EXIT_CODE_B=$?
 
-
-
 # STDERR
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" 2> log/minishell_stderr > /dev/null
 $INPUT
@@ -66,16 +87,11 @@ bash << EOF 2> log/bash_stderr > /dev/null
 $INPUT
 EOF
 
-# Valgrind : leaks
-# redir_out
-# redir_out append
-# redir_in
-# redir_in append
-#
+
 
 CLEAN=0
 
-# Print Result 
+echo -e "----------| Muffinette |----------\n"
 if diff -q log/minishell_output log/bash_output > /dev/null; then
   echo -e "STDOUT : ${GREEN}OK${NC}"
 else
@@ -92,7 +108,6 @@ else
   diff log/minishell_stderr log/bash_stderr
 fi
 
-
 if [[ "$EXIT_CODE_P" -ne "$EXIT_CODE_B" ]]; then
   echo -e "EXIT : ${RED}KO${NC}"
   echo -e "bash : $EXIT_CODE_B\nminishell: $EXIT_CODE_P"
@@ -101,8 +116,16 @@ else
   echo -e "EXIT : ${GREEN}OK${NC}"
 fi
 
+if [[ $REDIR == 1 ]]; then
+  . ./muffinette_redirection.sh
+fi
+
+if [[ $REDIR_A == 1 ]]; then
+  . ./muffinette_append_redirection.sh
+fi
+
 if [[ $LEAKS_FLAG == 1 ]]; then
-  . ./muffinette_leaks.sh $INPUT
+  . ./muffinette_leaks.sh
   CLEAN=1
 fi
 
