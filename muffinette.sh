@@ -89,8 +89,6 @@ bash << EOF 2> log/bash_stderr > /dev/null
 $INPUT
 EOF
 
-
-
 CLEAN=0
 
 echo -e "----------| Muffinette |----------\n"
@@ -131,9 +129,6 @@ if [[ $LEAKS_FLAG == 1 ]]; then
   CLEAN=1
 fi
 
-# ./muffinette.sh ls cd pwd "cd 42" ls "cd .." "env | grep PATH"
-
 if [[ $CLEAN == 0 ]]; then
   rm -rd log
 fi
-#
