@@ -81,6 +81,9 @@ EOF
 EXIT_CODE_B=$?
 
 # STDERR Filtrer le nom du programme
+# si bash grep command not found 
+#           permission denied
+#           ... ?
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" 2> log/minishell_stderr > /dev/null
 $INPUT
 EOF
