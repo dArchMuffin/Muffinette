@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#Seg Fault detecion to implement
-
 PROMPT_TO_CLEAN="^$USER@minishell"
 
 GREEN="\033[0;32m"
@@ -25,7 +23,7 @@ if [[ -z $1 ]]; then
   echo "./muffinette.sh --clean"
   echo -e "\nUse log/infile and log/outfile to test redirections"
   echo -e "./muffinette.sh -r <cmd1> \"<cmd2> <args> > log/outfile\""
-  echo -e "\nSeveral tests as here_doc and quotes management must be done manualy"
+  echo -e "\nSeveral tests as here_doc, signals or quotes management must be done manualy"
   echo -e "Some commands such as export and env will always display different outputs"
   # log/infile to implement
   # # input redir to implement
@@ -69,22 +67,17 @@ touch log/infile
 
 INPUT=$(printf "%s\n" "$@")
 
-# STDOUT && Exit CODE 
-./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/minishell_output 
+./minishell << EOF 2> /dev/null | grep -v "$PROMPT_TO_CLEAN" > log/minishell_output 
 $INPUT
 EOF
 EXIT_CODE_P=$?
 
-bash << EOF | grep -v "$PROMPT_TO_CLEAN" > log/bash_output
+bash << EOF 2> /dev/null | grep -v "$PROMPT_TO_CLEAN" > log/bash_output
 $INPUT
 EOF
 EXIT_CODE_B=$?
 
-# STDERR Filtrer le nom du programme
-# si bash grep command not found 
-#           permission denied
-#           ... ?
-./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" 2> log/minishell_stderr > /dev/null
+./minishell << EOF 2> log/minishell_stderr > /dev/null
 $INPUT
 EOF
 
@@ -103,13 +96,7 @@ else
   diff log/minishell_output log/bash_output
 fi
 
-if diff -q log/minishell_stderr log/bash_stderr > /dev/null; then
-  echo -e "STDERR : ${GREEN}OK${NC}"
-else
-  echo -e "STDERR : ${RED}KO${NC}"
-  CLEAN=1
-  diff log/minishell_stderr log/bash_stderr
-fi
+. ./muffinette_stderr.sh
 
 if [[ "$EXIT_CODE_P" -ne "$EXIT_CODE_B" ]]; then
   echo -e "EXIT : ${RED}KO${NC}"
@@ -120,11 +107,11 @@ else
 fi
 
 if [[ $REDIR == 1 ]]; then
-  . ./muffinette_redirection.sh
+  . ./muffinette_redirection.sh 2> /dev/null
 fi
 
 if [[ $REDIR_A == 1 ]]; then
-  . ./muffinette_append_redirection.sh
+  . ./muffinette_append_redirection.sh 2> /dev/null
 fi
 
 if [[ $LEAKS_FLAG == 1 ]]; then
