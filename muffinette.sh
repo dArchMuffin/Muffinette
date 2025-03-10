@@ -70,7 +70,7 @@ touch log/infile
 INPUT=$(printf "%s\n" "$@")
 
 # STDOUT && Exit CODE 
-./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/minishell_output
+./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/minishell_output 
 $INPUT
 EOF
 EXIT_CODE_P=$?
@@ -80,7 +80,7 @@ $INPUT
 EOF
 EXIT_CODE_B=$?
 
-# STDERR
+# STDERR Filtrer le nom du programme
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" 2> log/minishell_stderr > /dev/null
 $INPUT
 EOF
