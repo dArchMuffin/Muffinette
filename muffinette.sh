@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROMPT_TO_CLEAN="^$USER@minishell"
+PROMPT_TO_CLEAN="^\[Minishell\]"
 
 GREEN="\033[0;32m"
 RED="\033[0;31m"
