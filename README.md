@@ -1,6 +1,6 @@
 # 🧁 Muffinette - A MiniTester for a MiniShell 
 
-Muffinette is a set of Bash scripts written by following the side quests of 42 cursus inviting to understand and use bash syntax and commands.
+Muffinette is a set of Bash scripts I created during my 42 cursus, applying the Bash fundamentals I learnt through different projects of 42.
 
 Muffinette is designed to test your `minishell` project by sending sequences of inputs and comparing its output and behavior to that of the standard `bash` shell. It helps you identify differences in standard output (STDOUT), standard error (STDERR), exit codes, redirections...
 Additionaly it runs a valgrind check while executing your 'minishell'.
