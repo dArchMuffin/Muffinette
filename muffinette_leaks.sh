@@ -17,7 +17,7 @@ else
   echo -e "${RED}LEAKS !${NC}"
 fi
 
-  NB_ERR=$(grep -v "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" log/valgrind_output | grep "ERROR SUMMARY: " | wc -l)
+NB_ERR=$(grep -v "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" log/valgrind_output | grep "ERROR SUMMARY: " | wc -l)
   if [[ $NB_ERR == 0 ]]; then
   echo -e "${GREEN}NO ERRORS${NC}"
 else
