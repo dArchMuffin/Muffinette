@@ -64,6 +64,8 @@ If you use characters that the shell would interpret, use \ before :
 PROMPT_TO_CLEAN="^\[Minishell\]\$"
 ```
 
+Now, we are ready to cook !
+
 ---
 
 ### _"One is never better served than by oneself"_ 😋
@@ -142,7 +144,7 @@ Same for arguments of a command, it must be quoted with :
 
 Example :
   ```bash
-  ./muffinette.sh -leaks -r ls "cd .." "pwd" "ls -l | wc -l" "echo 42 > log/outfile" 
+  ./muffinette.sh -leaks -r ls "cd .." "pwd" "ls -l | wc -l" "echo '42' > log/outfile" 
   ```
 ### muff.sh 🥗
 
