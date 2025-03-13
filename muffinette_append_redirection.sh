@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# TO DO: rendre fichier clickable
-
-# redir_out append
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/outfile > /dev/null
 $INPUT
 EOF

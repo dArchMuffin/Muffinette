@@ -43,6 +43,8 @@ Franc Zappa - Muffin Man" > log/infile
 
 
 
+
+
 if [[ -z $1 ]]; then
   echo -e "-----------------------------| Muffinette usage |-----------------------------\n"
   echo -e "1 : Make sure to have your minishell binary in muffinette's folder"
@@ -96,15 +98,14 @@ if [[ $1 == "--muffin" ]]; then
   exit 
 fi
 
-## THE MAGIC ##
+########### THE MAGIC SAUCE ############
 
-#using \n as a separator to simulate sepearates inputs to get_next_line / read 
+# 1 : using \n as a separator to simulate sepearates inputs in get_next_line / read of minishell / bash 
+
 INPUT=$(printf "%s\n" "$@")
 
-# Using here_doc on minishell and bash to simulate sequences of inputs
-# rederecting stdout / stderr to log files 
-# grep -v to clean the minishell output of his prompt
-# using $? to get last exit code
+# 2 : Using here_doc on minishell and bash to simulate sequences of inputs
+# 3 : rederecting stdout / stderr to log files 
 
 ./minishell << EOF 2> /dev/null | grep -v "$PROMPT_TO_CLEAN" > log/minishell_output 
 $INPUT
@@ -116,6 +117,9 @@ $INPUT
 EOF
 EXIT_CODE_B=$?
 
+# 4 : grep -v to clean the minishell output of his prompt
+# 5 : using $? to get last exit code
+
 ./minishell << EOF 2> log/minishell_stderr > /dev/null
 $INPUT
 EOF
@@ -124,7 +128,8 @@ bash << EOF 2> log/bash_stderr > /dev/null
 $INPUT
 EOF
 
-# executing diff, grep and some sweet bash syntax to compare 
+# 6 : some spicy stuff with valgrind
+# 7 : executing diff, grep and some sweet bash syntax to compare 
 # and finaly echo the results
 
 CLEAN=0
