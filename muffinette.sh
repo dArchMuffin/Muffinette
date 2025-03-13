@@ -111,7 +111,7 @@ $INPUT
 EOF
 EXIT_CODE_P=$?
 
-bash << EOF 2> /dev/null | grep -v "$PROMPT_TO_CLEAN" > log/bash_output
+bash << EOF 2> /dev/null > log/bash_output
 $INPUT
 EOF
 EXIT_CODE_B=$?
