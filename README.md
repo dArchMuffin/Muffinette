@@ -97,9 +97,7 @@ STDOUT : OK
 STDERR : OK
 EXIT : OK
 ```
-Note : If you want a shorter output, just comment lines displaying fancy stuff in muffinette.sh. 
-
-Without flags, it will send a sequence of 5 inputs in your minishell and bash, and compare STDOUT, STDERR and the exit code.
+It will send a sequence of 5 inputs in both your minishell and bash, and compare STDOUT, STDERR and the exit code.
 
 Using flags, you can extend the tests :
 

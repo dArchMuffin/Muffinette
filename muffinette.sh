@@ -52,7 +52,11 @@ if [[ -z $1 ]]; then
   echo -e "-----------------------------| Muffinette usage |-----------------------------\n"
   echo -e "1 : Make sure to have your minishell binary in muffinette's folder"
   echo -e "2 : Your binary must be named \"minishell\""
+<<<<<<< HEAD
   echo -e "3 : Edit muffinette.sh following the README"
+=======
+  echo -e "3 : Read the README !!"
+>>>>>>> f02c87f5412ea045300112740bfc3a32e8418025
   exit 
 fi
 
