@@ -14,7 +14,7 @@ mkdir -p log
 #or even a redirection, but dont forget the flag as first argument !
 ./muffinette.sh "-r" "echo '180g milk' > log/outfile" 
 
-#systematicly put the --leaks as flag first !
+#always put the --leaks as flag first !
 ./muffinette.sh "--leaks" "-ra" "echo '5g vanilla' >> log/outfile"
 
 #to test quotes, use \" or ' or \' ... 
