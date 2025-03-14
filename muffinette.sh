@@ -49,19 +49,7 @@ if [[ -z $1 ]]; then
   echo -e "-----------------------------| Muffinette usage |-----------------------------\n"
   echo -e "1 : Make sure to have your minishell binary in muffinette's folder"
   echo -e "2 : Your binary must be named \"minishell\""
-  echo -e "\nYour minishell probably prints its prompt and user input on stdout, bash don't"
-  echo -e "To filter it and compare outputs, edit the first line of muffinette.sh: "
-  echo -e "PROMPT_TO_CLEAN=\"^<your-minishell-prompt>\""
-  echo -e "\n./muffinette.sh <cmd1> <cmd2> <cmd3> <cmd4>"
-  echo "./muffinette.sh \"<cmd1> <args>\" <cmd2> <cmd3> <cmd4>"
-  echo "./muffinette.sh \"<cmd1> <args> | <cmd2> <args>\" <cmd3> <cmd4>"
-  echo -e "\nflags :"
-  echo "./muffinette.sh --leaks <cmd1> <cmd2> <cmd3> <cmd4>"
-  echo "./muffinette.sh --clean"
-  echo -e "\nUse log/infile and log/outfile to test redirections"
-  echo -e "./muffinette.sh -r <cmd1> \"<cmd2> <args> > log/outfile\""
-  echo -e "\nSeveral tests as here_doc, signals or quotes management must be done manualy"
-  echo -e "Some commands such as export and env will always display different outputs"
+  echo -e "3 : Read the README !!"
   exit 
 fi
 
