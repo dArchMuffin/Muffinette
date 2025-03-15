@@ -142,7 +142,7 @@ EOF
 ```
 So, in order to compare outputs, we need to clean your minishell output.
 
-Execute your minishell with here_doc as described, copy and paste the prompt line in the muffinette.sh PROMPT_TO_CLEAN variable, preserving the ^ character.
+Execute your minishell with here_doc as described, copy and paste the prompt line in the muffinette.sh PROMPT variable.
 
 If you use characters that the shell would interpret, use \ before : 
 ```bash
