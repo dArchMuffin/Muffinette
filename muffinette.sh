@@ -168,6 +168,7 @@ fi
 
 CLEAN=0
 
+# print result for STDOUT
 if diff -q log/minishell_output log/bash_output > /dev/null; then
   echo -e "STDOUT : ${GREEN}OK${NC}"
 else
@@ -178,6 +179,7 @@ fi
 
 ERROR_MISSING=0
 
+# checking stderr error management
 if [[ $(grep -i "command not found" log/bash_stderr | wc -l) != $(grep -i "command not found" log/minishell_stderr | wc -l) ]]; then
   ERROR_MISSING=1
 fi
@@ -202,7 +204,7 @@ else
   CLEAN=1
 fi
 
-
+# comparing exit code
 if [[ "$EXIT_CODE_P" -ne "$EXIT_CODE_B" ]]; then
   echo -e "EXIT : ${RED}KO${NC}"
   echo -e "bash : $EXIT_CODE_B\nminishell: $EXIT_CODE_P"
@@ -211,6 +213,7 @@ else
   echo -e "EXIT : ${GREEN}OK${NC}"
 fi
 
+# Option redirection
 if [[ $REDIR == 1 ]]; then
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/outfile > /dev/null
 $INPUT
@@ -237,6 +240,7 @@ EOF
   fi
 fi
 
+# option redirection with append
 if [[ $REDIR_A == 1 ]]; then
 ./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/outfile > /dev/null
 $INPUT
