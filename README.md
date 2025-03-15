@@ -97,7 +97,7 @@ Same for arguments of a command, it must be quoted with :
 
 Example :
   ```bash
-  ./muffinette.sh -leaks -r ls "cd .." "pwd" "ls -l | wc -l" "echo '42' > log/outfile" 
+  ./muffinette.sh --leaks -r ls "cd .." "pwd" "ls -l | wc -l" "echo '42' > log/outfile" 
   ```
 ### muff.sh 🥗
 
@@ -113,7 +113,9 @@ If you are ready to get your hands dirty, I hope my scripts are commented enough
 
 Please, share you improvements with us ! 
 
-### Troubleshooting 
+---
+
+## Troubleshooting 
 Normally, muffinette should automaticaly extract from minishell output the prompt and the command sent.
 If STDOUT test always fail, you might need to manualy clean your minishell prompt.
 Edit your code to stick to bash prompt, or edit the muffinette.sh variable PROMPT as follow :
