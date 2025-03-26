@@ -12,10 +12,6 @@ FAILED_TEST="failed_tests"
 #if your STDOUT appears always KO for no reason, read the README and edit this line
 PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
 
-#comment these lines for a shorter output for quick tests or recipes.sh full tests
-# echo -e "----------| Muffinette |----------"
-# echo ""
-
 # uncommenting following lines will always displays the sequence sent to test in head of the tastor output
 # for arg in "$@"; do
 #   if [[ "$arg" != "--leaks" && "$arg" != "-r" && "$arg" != "-ra" ]]; then
@@ -26,36 +22,7 @@ PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
 
 mkdir -p log
 
-[ -f "log/outfile" ] && rm -f "log/outfile"
-[ -f "log/file1" ] && rm -f "log/file1"
-[ -f "log/file2" ] && rm -f "log/file2"
-[ -f "log/infile" ] && rm -f "log/infile"
-if [[ $INFILE == 1 ]]; then
-  touch log/infile
-  if [[ $INFILE_PERM == 0 ]]; then
-    chmod 000 log/infile
-  fi
-fi
-if [[ $OUTFILE == 1 ]]; then
-  touch log/outfile
-  if [[ $OUTFILE_PERM == 0 ]]; then
-    chmod 000 log/outfile
-  fi
-fi
-if [[ $FILE1 == 1 ]]; then
-  touch log/file1
-  if [[ $FILE1_PERM == 0 ]]; then
-    chmod 000 log/file1
-  fi
-fi
-if [[ $FILE2 == 1 ]]; then
-  touch log/file2
-  if [[ $FILE2_PERM == 0 ]]; then
-    chmod 000 log/file2
-  fi
-fi
-touch log/file_without_permissions
-chmod 000 log/file_without_permissions
+
 
 # comment these lines to test an empty infile, or customize for your taste
 echo -e "Some people... some people like cupcakes, exclusively... 
@@ -85,7 +52,7 @@ OUTFILE=1
 OUTFILE_PERM=1
 FILE1=1
 FILE1_PERM=1
-FILE2_=1
+FILE2=1
 FILE2_PERM=1
 
 LEAKS_FLAG=0
@@ -119,12 +86,27 @@ if [[ $1 == "--infile=off" ]]; then
   INFILE=0
   shift
 fi
-
 if [[ $1 == "--infile=000" ]]; then
   INFILE_PERM=0
   shift
 fi
+if [[ $1 == "--file1=off" ]]; then
+  FILE1=0
+  shift
+fi
+if [[ $1 == "--file1=000" ]]; then
+  FILE1_PERM=0
+  shift
+fi
+if [[ $1 == "--file2=off" ]]; then
+  FILE2=0
+  shift
+fi
 
+if [[ $1 == "--file2=000" ]]; then
+  FILE2_PERM=0
+  shift
+fi
 if [[ $1 == "--outfile=off" ]]; then
   OUTFILE=0
   shift
@@ -135,25 +117,37 @@ if [[ $1 == "--outfile=000" ]]; then
   shift
 fi
 
-if [[ $1 == "--file1=off" ]]; then
-  FILE1=0
-  shift
-fi
 
-if [[ $1 == "--file1=000" ]]; then
-  FILE1_PERM=0
-  shift
+[ -f "log/outfile" ] && rm -f "log/outfile"
+[ -f "log/file1" ] && rm -f "log/file1"
+[ -f "log/file2" ] && rm -f "log/file2"
+[ -f "log/infile" ] && rm -f "log/infile"
+if [[ $INFILE == 1 ]]; then
+  touch log/infile
+  if [[ $INFILE_PERM == 0 ]]; then
+    chmod 000 log/infile
+  fi
 fi
-
-if [[ $1 == "--file2=off" ]]; then
-  FILE2=0
-  shift
+if [[ $OUTFILE == 1 ]]; then
+  touch log/outfile
+  if [[ $OUTFILE_PERM == 0 ]]; then
+    chmod 000 log/outfile
+  fi
 fi
-
-if [[ $1 == "--file2=000" ]]; then
-  FILE2_PERM=0
-  shift
+if [[ $FILE1 == 1 ]]; then
+  touch log/file1
+  if [[ $FILE1_PERM == 0 ]]; then
+    chmod 000 log/file1
+  fi
 fi
+if [[ $FILE2 == 1 ]]; then
+  touch log/file2
+  if [[ $FILE2_PERM == 0 ]]; then
+    chmod 000 log/file2
+  fi
+fi
+touch log/file_without_permissions
+chmod 000 log/file_without_permissions
 
 # Johann working on ...
 if [[ $1 == "--muffin" ]]; then
@@ -193,9 +187,6 @@ MINISHELL_FILE2=$(<log/file2)
 echo "$OLD_OUTFILE" > log/outfile
 echo "$OLD_FILE1" > log/file1
 echo "$OLD_FILE2" > log/file2
-
-# si option outfile non existing activee : 
-# rm log/outfile
 
 # We execute the same test on bash to have a reference 
 bash << EOF 2> /dev/null > log/bash_output
@@ -317,9 +308,9 @@ fi
 
 # Option redirection
 if [[ $REDIR == 1 ]]; then
-  if [[ $(diff -q "$MINISHELL_OUTFILE" "$BASH_OUTFILE" > /dev/null 2>/dev/null) ]] || 
-    [[ $(diff -q "$MINISHELL_FILE1" "$BASH_FILE1" > dev/null 2>/dev/null) ]] ||
-    [[ $(diff -q "$MINISHELL_FILE2" "$BASH_FILE2" > dev/null 2>/dev/null) ]]; then
+  if [[ $(diff -q "$MINISHELL_OUTFILE" "$BASH_OUTFILE" > /dev/null 2> /dev/null) ]] || 
+    [[ $(diff -q "$MINISHELL_FILE1" "$BASH_FILE1" > /dev/null 2> /dev/null) ]] ||
+    [[ $(diff -q "$MINISHELL_FILE2" "$BASH_FILE2" > /dev/null 2> /dev/null) ]]; then
     echo -e "REDIR > : ${RED}KO${NC}"
     diff $MINISHELL_OUTFILE $BASH_OUTFILE
     diff $MINISHELL_FILE1 $BASH_FILE1

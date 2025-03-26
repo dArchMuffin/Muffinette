@@ -18,14 +18,20 @@ source cookware.sh
 # theses variables set autosave, valgrind check and redirection check to disable by default
 # just switch it to 1 to enable it by default, or use CLI cmds
 AUTO_SAVE_FLAG=0
+
+TIMEOUT_DURATION=5
 VALGRIND_FLAG=0
 R_FLAG=0
+
 INFILE_FLAG=0
 INFILE_PERM_FLAG=0
+
 FILE1_FLAG=0
 FILE1_PERM_FLAG=0
+
 FILE2_FLAG=0
 FILE2_PERM_FLAG=0
+
 OUTFILE_FLAG=0
 OUTFILE_PERM_FLAG=0
 
@@ -52,20 +58,29 @@ while IFS= read -r INPUT; do
     # !! after a test, load back and execute last sequence
     "!!")
       set_flags
-      ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
       ;;
     # !! after a test, load back and execute last sequence with a valgrind test
     "!v")
       VALGRIND_FLAG=1
       set_flags
-      ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
       VALGRIND_FLAG=0
       ;;
     # !! after a test, load back and execute last sequence with a redirection test
     "!>")
       R_FLAG=1
       set_flags
-      ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
       R_FLAG=0
       ;;
     # -h --help : dispaly help
@@ -130,7 +145,7 @@ while IFS= read -r INPUT; do
       ;;
       # run muffinette.sh with your custom tests in recipes.sh
     "--recipes")
-      kitty --detach bash -c './recipes.sh; read'
+      ./recipes.sh
       ;;
       # open a new tty with a bash shell
     "--bash")
@@ -183,6 +198,19 @@ while IFS= read -r INPUT; do
       OUTFILE_PERM_FLAG=$((1 - OUTFILE_PERM_FLAG))
       echo -e "${YELLOW}outfile perm = $( [[ $OUTFILE_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
       ;;
+    "--add-recipe")
+      if [[ ${#ARGS[@]} -ne 0 ]]; then 
+        echo -n 'recipes ' >> recipes.sh
+        for ARG in "${ARGS[@]}"; do
+          printf '"%s" ' "$(echo "$ARG" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\$/\\$/g' -e 's/`/\\`/g')" >> recipes.sh
+        done
+        echo >> recipes.sh
+        echo -e "${YELLOW}${ARGS[@]}\nadded to recipe${NC}"
+        echo
+      else
+        echo -e "${YELLOW}No sequence to add to recipes${NC}"
+      fi
+      ;;
       # add your custom cmd here
       #"--cmd")
       #<execution>
@@ -201,7 +229,10 @@ while IFS= read -r INPUT; do
         print_flags
       else
         set_flags
-        ./taster.sh "${FLAGS[@]}" "${ARGS[@]}" 2> /dev/null
+        timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${ARGS[@]}" 2> /dev/null
+        if [[ $? -eq 124 ]]; then
+          echo -e "${RED}TIME OUT !${NC}"
+        fi
         LAST_SEQ=("${ARGS[@]}")
         ARGS=()
       fi
