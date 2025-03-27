@@ -1,5 +1,95 @@
 #!/bin/bash
 
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+NC="\033[0m"
+
+recipes()
+{
+  FILTERED_ARGS=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --leaks|--as|-r|--infile=*|--file1=*|--file2=*|--outfile=*)
+        shift
+        ;;
+      *)
+        FILTERED_ARGS+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+
+  KO=0
+
+  OUTPUT=$(timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FILTERED_ARGS[@]}") 
+  if [[ $? -eq 124 ]]; then
+    echo -e "${FILTERED_ARGS[@]} : ${RED}TIME OUT !${NC}"
+    KO=1
+  fi
+  TASTOR=$(echo -e "$OUTPUT" | sed 's/\x1B\[[0-9;]*m//g')
+
+  if echo -e "$TASTOR" | grep -q "STDOUT : KO"; then
+    echo -en "${FILTERED_ARGS[@]} : STDOUT :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "STDERR : KO"; then
+    echo -en "${FILTERED_ARGS[@]} : STDERR :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "EXIT : KO"; then
+    echo -en "${FILTERED_ARGS[@]} : EXIT :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "SEGMENTATION FAULT"; then
+    echo -en "${FILTERED_ARGS[@]} : $RED SEGMENTATION FAULT$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "LEAKS !"; then
+    echo -en "${FILTERED_ARGS[@]} : LEAKS :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "ZOMBIE PROCESS !"; then
+    echo -en "${FILTERED_ARGS[@]} : ZOMBIE PROCESS :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "ERRORS !"; then
+    echo -en "${FILTERED_ARGS[@]} : VALGRIND ERRORS :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "FD OPEN AT EXIT !"; then
+    echo -en "${FILTERED_ARGS[@]} : FD :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if echo -e "$TASTOR" | grep -q "REDIR > : KO"; then
+    echo -en "${FILTERED_ARGS[@]} : REDIR > :$RED KO$NC"
+    echo
+    KO=1
+  fi
+
+  if [[ $KO == 0 ]]; then
+    echo -en "${FILTERED_ARGS[@]} :$GREEN OK$NC"
+    echo
+  fi
+}
+
 print_help()
 {
   echo -e "$YELLOW"

@@ -5,6 +5,7 @@
 # I used yellow color to visualy separate the output of muffinette.sh and tastor.sh
 # tastor.sh prints in white, muffinette.sh prints in yellow
 YELLOW="\033[0;33m"
+RED="\033[0;31m"
 NC="\033[0m"
 
 # set -x
@@ -17,7 +18,7 @@ source cookware.sh
 
 # theses variables set autosave, valgrind check and redirection check to disable by default
 # just switch it to 1 to enable it by default, or use CLI cmds
-AUTO_SAVE_FLAG=0
+# AUTO_SAVE_FLAG=0
 
 TIMEOUT_DURATION=5
 VALGRIND_FLAG=0
@@ -96,13 +97,13 @@ while IFS= read -r INPUT; do
       ;;
     # --watch= : new tty with watch on a log file option
     # see README for details
-    "--auto-save")
-      if [[ $AUTO_SAVE_FLAG == 1 ]]; then
-        AUTO_SAVE_FLAG=0
-      else
-        AUTO_SAVE_FLAG=1
-      fi
-      ;;
+    # "--auto-save")
+      # if [[ $AUTO_SAVE_FLAG == 1 ]]; then
+        # AUTO_SAVE_FLAG=0
+      # else
+        # AUTO_SAVE_FLAG=1
+      # fi
+      # ;;
     "--watch="*)
       watch_logs "${INPUT#--watch=}"
       ;;
@@ -205,7 +206,7 @@ while IFS= read -r INPUT; do
           printf '"%s" ' "$(echo "$ARG" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\$/\\$/g' -e 's/`/\\`/g')" >> recipes.sh
         done
         echo >> recipes.sh
-        echo -e "${YELLOW}${ARGS[@]}\nadded to recipe${NC}"
+        echo -e "${YELLOW}${ARGS[@]}\nadded to recipes${NC}"
         echo
       else
         echo -e "${YELLOW}No sequence to add to recipes${NC}"
@@ -225,7 +226,7 @@ while IFS= read -r INPUT; do
       if [[ ${#ARGS[@]} -eq 0 ]]; then
         echo -e "${YELLOW}No inputs recorded"
         echo ""
-        echo "use -h or --help for usage informations"
+        echo "use -h or --help for usage informations${NC}"
         print_flags
       else
         set_flags
