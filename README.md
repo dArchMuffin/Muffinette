@@ -83,7 +83,7 @@ Run the tester with all the tests registered in recipes.sh with :
 To use taster.sh without his CLI, see the detailed usage in the **[former README](https://github.com/dArchMuffin/Muffinette/blob/5b1f324/README.md)** and run :
 
 ```bash
-./.sh
+./taster.sh
 ```
 
 <a id="basic-usage"></a>
