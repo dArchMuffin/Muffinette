@@ -25,8 +25,8 @@ R_FLAG=0
 # Here you can enable or disable files existence or permissions by default
 INFILE_FLAG=0
 INFILE_PERM_FLAG=0
-# INFILE_FLAG = 0 means it exists
-# INFILE_PERM_FLAG = 0 means it will be chmod 644
+# INFILE_FLAG = 0 means the file will be existing during tests / 1 means it will NOT exist for tests
+# INFILE_PERM_FLAG = 0 means it will be chmod 644 / 1 means chmod 000
 
 FILE1_FLAG=0
 FILE1_PERM_FLAG=0
