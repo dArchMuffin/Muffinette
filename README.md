@@ -134,7 +134,7 @@ You can add a sequence to recipes.sh from Muffinette using `--add-recipe`.
 
 It will add the sequence in buffer to recipes.sh, so you might want to use `!` first if you want to add the last sequence tested.
 
-Thus, from start, you can build your minishel as you build it.
+You are now ready to test your minishel as you build it.
 
 For fancy usage, see below.
 
