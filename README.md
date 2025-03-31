@@ -126,17 +126,19 @@ Using the !v command, I ran again the last sequence of command lines, with a val
 
 You can see the output of your minishell with a cat log/minishell_output in your shell, or using the --print=stoud CLI command.
 
-If there is only few CLI commands you need, the --oops and the ! !! !v !> CLI commands are the essentials.
+If there is only few CLI commands you need, the --oops and the `!` `!!` `!v` `!>` CLI commands are the essentials.
 
-For an extended usage, you might want to use the `--recipes` feature. It runs recipes.sh with all registered tests.
+After quick tests, you might want to centralize your tests to run them all at once :
 
-You can add a sequence to recipes.sh from Muffinette using `--add-recipe`.
+`--add-recipe`
 
-It will add the sequence in buffer to recipes.sh, so you might want to use `!` first if you want to add the last sequence tested.
+Add a sequence to recipes.sh. by default the sequence in buffer, or if empty, the last sequence sent to test. 
+
+`[Muffinette]$ --recipes`
+
+Runs recipes.sh with all registered tests.
 
 You are now ready to test your minishel as you build it.
-
-For fancy usage, see below.
 
 <a id="cli-commands"></a>
 ## CLI commands 🍴 
