@@ -1,7 +1,5 @@
 #!/bin/bash
 
-mkdir -p log
-
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
@@ -9,13 +7,12 @@ NC="\033[0m"
 #if your STDOUT appears always KO, read the README and edit this line
 PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
 
-# uncommenting following lines will always displays the sequence sent to test in head of the tastor output
-# for arg in "$@"; do
-#   if [[ "$arg" != "--leaks" && "$arg" != "-r" && "$arg" != "-ra" ]]; then
-#     echo -e "$PROMPT $arg"
-#   fi
-# done
-# echo ""
+if [[ $(find . -maxdepth 1 -type f -name minishell | wc -l) == 0 ]]; then
+  echo "Error : no 'minishell' binary found in current working directory"
+  exit 
+fi
+
+mkdir -p log
 
 # customize default files variables
 #infile = 1 means it exists
@@ -30,6 +27,14 @@ FILE2=1
 FILE2_PERM=1
 
 LEAKS_FLAG=0
+
+# uncommenting following lines will always displays the sequence sent to test in head of the tastor output
+# for arg in "$@"; do
+#   if [[ "$arg" != "--leaks" && "$arg" != "-r" && "$arg" != "-ra" ]]; then
+#     echo -e "$PROMPT $arg"
+#   fi
+# done
+# echo ""
 
 # comment these lines to test an empty infile, or customize for your taste
 echo -e "Some people... some people like cupcakes, exclusively... 
@@ -59,10 +64,6 @@ fi
 # edit this variable to set your own failed test folder for auto save of logs
 # FAILED_TEST="failed_tests"
 
-if [[ $(find . -maxdepth 1 -type f -name minishell | wc -l) == 0 ]]; then
-  echo "Error : no 'minishell' binary found in current working directory"
-  exit 
-fi
 
 # All these lines are switches to enable or disable some features 
 # To change default values, edit the variables in CLI directly
