@@ -108,7 +108,6 @@ while IFS= read -r INPUT; do
       # ;;
     "--muffinator")
     # terminator -l config
-    # virer tout le watch log de cookware
       ;;
     # --print=* : print log file
     "--print=stdout")
