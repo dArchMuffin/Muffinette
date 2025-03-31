@@ -3,6 +3,7 @@
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
+CYAN='\033[0;36m'
 
 # This script contains all functions i need elsewhere 
 
@@ -96,37 +97,54 @@ recipes()
 }
 
 # a user cheatshit for CLI commands 
-print_help()
-{
-  echo -e "$YELLOW"
-  echo "╔═══════════════════════════════════════════════════════════════════╗"
-  echo "║                         Muffinette Usage                          ║"
-  echo "╠═══════════════════════════════════════════════════════════════════╣"
-  echo "║ Each line you type composes the inputs sequence                   ║"
-  echo "║ Just send an empty prompt to run the sequence                     ║"
-  echo "║                                                                   ║"
-  echo "║ Flags : (switches ON/OFF)                                         ║"
-  echo "║ --valgrind         : Run a full valgrind test                     ║"
-  echo "║ -- >             : Test redirection out                           ║"
-  echo "║ -- >>            : Test redirection out with append               ║"
-  echo "║ --print=flags   : Display flags status                            ║"
-  echo "║                                                                   ║"
-  echo "║ Display infos:                                                    ║"
-  echo "║ --print=seq     : Print the inputs sequence in memory             ║"
-  echo "║ --print=stdout  : Show minishell & bash stdout logs               ║"
-  echo "║ --print=stderr  : Show minishell & bash stderr logs               ║"
-  echo "║ --print=valgrind: Show valgrind logs                              ║"
-  echo "║ --watch=stdout  : Open 2 terminals watching stdout logs           ║"
-  echo "║ --watch=stderr  : Open 2 terminals watching stderr logs           ║"
-  echo "║ --watch=valgrind: Open a terminal watching valgrind logs          ║"
-  echo "║                                                                   ║"
-  echo "║ Other Commands:                                                   ║"
-  echo "║ --oops          : Remove last input from sequence in memory       ║"
-  echo "║ --recipes       : Run recipes.sh                                  ║"
-  echo "║                                                                   ║"
-  echo "║ Or just type \"bye\" to quit                                        ║"
-  echo "╚═══════════════════════════════════════════════════════════════════╝"
-  echo -e "$NC"
+print_help() {
+  echo -e "${YELLOW}╔════════════════════════════════ Muffinette Help ═════════════════════════════╗
+║                                                                              ║
+║  ${CYAN}Basic Usage:${YELLOW}                                                                ║
+║    • Enter commands to build a test sequence                                 ║
+║    • Press [Enter] with empty input to execute the sequence                  ║
+║    • Use ${CYAN}!${YELLOW} to recall last sequence, ${CYAN}!!${YELLOW} to recall and execute it              ║
+║                                                                              ║
+║  ${CYAN}Quick Actions:${YELLOW}                                                              ║
+║    ${CYAN}!${YELLOW}        - Recall last sequence (display only)                            ║
+║    ${CYAN}!!${YELLOW}       - Recall and execute last sequence                               ║
+║    ${CYAN}!v${YELLOW}       - Recall and execute last sequence with valgrind                 ║
+║    ${CYAN}!>${YELLOW}       - Recall and execute last sequence with redirection test         ║
+║    ${CYAN}-o/--oops${YELLOW} - Remove last input from current sequence                       ║
+║                                                                              ║
+║  ${CYAN}Session Control:${YELLOW}                                                            ║
+║    ${CYAN}bye/quit/exit${YELLOW} - Exit Muffinette and clean up                              ║
+║    ${CYAN}--bash${YELLOW}        - Open new terminal with bash                               ║
+║    ${CYAN}--minishell${YELLOW}   - Open new terminal with minishell                          ║
+║    ${CYAN}--spatule${YELLOW}     - Open side-by-side bash and minishell terminals            ║
+║                                                                              ║
+║  ${CYAN}Flag Management:${YELLOW}                                                            ║
+║    ${CYAN}--valgrind/-vg${YELLOW}      - Toggle valgrind check                               ║
+║    ${CYAN}->${YELLOW}                  - Toggle redirection test                             ║
+║    ${CYAN}--infile${YELLOW}            - Toggle infile existence                             ║
+║    ${CYAN}--infile-perm${YELLOW}       - Toggle infile permissions                           ║
+║    ${CYAN}--file1${YELLOW}             - Toggle file1 existence                              ║
+║    ${CYAN}--file1-perm${YELLOW}        - Toggle file1 permissions                            ║
+║    ${CYAN}--file2${YELLOW}             - Toggle file2 existence                              ║
+║    ${CYAN}--file2-perm${YELLOW}        - Toggle file2 permissions                            ║
+║    ${CYAN}--outfile${YELLOW}           - Toggle outfile existence                            ║
+║    ${CYAN}--outfile-perm${YELLOW}      - Toggle outfile permissions                          ║
+║    ${CYAN}-pf/--print=flags${YELLOW}   - Display current flag status                         ║
+║                                                                              ║
+║  ${CYAN}Print Options:${YELLOW}                                                              ║
+║    ${CYAN}--print=stdout${YELLOW}     - Display stdout log                                   ║
+║    ${CYAN}--print=stderr${YELLOW}     - Display stderr log                                   ║
+║    ${CYAN}--print=valgrind${YELLOW}   - Display valgrind output                              ║
+║    ${CYAN}--print=outfile${YELLOW}    - Display outfile contents                             ║
+║    ${CYAN}-ps/--print=seq${YELLOW}    - Display current sequence                             ║
+║    ${CYAN}-pls/--print=last-seq${YELLOW} - Display last executed sequence                    ║
+║                                                                              ║
+║  ${CYAN}Advanced Features:${YELLOW}                                                          ║
+║    ${CYAN}--recipes${YELLOW}       - Run custom tests from recipes.sh                        ║
+║    ${CYAN}--add-recipe${YELLOW}    - Add current/last sequence to recipes.sh                 ║
+║                                                                              ║
+║  ${CYAN}Note:${YELLOW} Any other input will be added to the test sequence                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
 # --print=stdout output 

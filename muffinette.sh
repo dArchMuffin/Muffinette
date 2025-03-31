@@ -92,10 +92,10 @@ while IFS= read -r INPUT; do
     # -bye : quit and clean
     "bye"|"quit"|"exit")
       pgrep watch | tail -n +2 | xargs kill 2> /dev/null
-      if [[ -z log/file_without_permissions ]]; then
-        chmod 644 log/file_without_permissions
-      fi
-      rm -rd log 2> /dev/null
+      # if [[ ! -z log/file_without_permissions ]]; then
+      #   chmod 644 log/file_without_permissions
+      # fi
+      rm -rf log 2> /dev/null
       exit 0
       ;;
     # --watch= : new tty with watch on a log file option

@@ -31,5 +31,5 @@ recipes "echo -e \"two eggs\"" "echo -e '100g sugar'"
 # You can either add your own tests here manualy, or you can use the --add-recipe command, 
 # the sequence in buffer will be added after this linesm ready to run with ./recipes.sh or --recipes in CLI. 
 
-# I highly recommend to keep this file clean and organized by sorting tests in categories here 
+# I recommend to keep this file clean and organized by sorting tests in categories here 
 # Comments are your friends !

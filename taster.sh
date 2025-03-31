@@ -6,10 +6,7 @@ GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
 
-# edit this variable to set your own failed test folder for auto save of logs
-FAILED_TEST="failed_tests"
-
-#if your STDOUT appears always KO for no reason, read the README and edit this line
+#if your STDOUT appears always KO, read the README and edit this line
 PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
 
 # uncommenting following lines will always displays the sequence sent to test in head of the tastor output
@@ -43,9 +40,9 @@ if [[ -z $1 ]]; then
 fi
 
 # customize default files variables
-# by default infile = 1 means it exists
+#infile = 1 means it exists
 INFILE=1
-# by default infile_perm = 1 means chmod 644
+#infile_perm = 1 means chmod 644
 INILE_PERM=1
 OUTFILE=1
 OUTFILE_PERM=1
@@ -58,12 +55,17 @@ LEAKS_FLAG=0
 
 # WORKING ON Bye default, auto-save of failed tests logs is disable, switch this variable to 1 to enable it
 # AUTO_SAVE=0
+#
+# edit this variable to set your own failed test folder for auto save of logs
+# FAILED_TEST="failed_tests"
 
 if [[ $(find . -maxdepth 1 -type f -name minishell | wc -l) == 0 ]]; then
   echo "Error : no 'minishell' binary found in current working directory"
   exit 
 fi
 
+# All these lines are switches to enable or disable some features 
+# To change default values, edit the variables in CLI directly
 if [[ $1 == "--leaks" ]]; then
   LEAKS_FLAG=1;
   shift
@@ -118,11 +120,13 @@ if [[ $1 == "--outfile=000" ]]; then
   shift
 fi
 
+# We clean all existing files first
 [ -f "log/outfile" ] && rm -f "log/outfile"
 [ -f "log/file1" ] && rm -f "log/file1"
 [ -f "log/file2" ] && rm -f "log/file2"
 [ -f "log/infile" ] && rm -f "log/infile"
 
+# Then, following the flags sent to tastor.sh, we create and chmod the files
 if [[ $INFILE == 1 ]]; then
   touch log/infile
   if [[ $INFILE_PERM == 0 ]]; then
@@ -148,6 +152,7 @@ if [[ $FILE2 == 1 ]]; then
   fi
 fi
 
+# There is a no perm file available anyway
 touch log/file_without_permissions
 chmod 000 log/file_without_permissions
 
@@ -188,7 +193,7 @@ MINISHELL_OUTFILE=$(<log/outfile)
 MINISHELL_FILE1=$(<log/file1)
 MINISHELL_FILE2=$(<log/file2)
 
-# get files back to original state for bash to use it now
+# get files back to original state for bash to use it in same conditions now
 echo "$OLD_OUTFILE" > log/outfile
 echo "$OLD_FILE1" > log/file1
 echo "$OLD_FILE2" > log/file2
@@ -222,13 +227,13 @@ EOF
 
   LEAKS=0
 
-  # Basicaly, if we find this line in the log file, it means there's a segfault, so print in red KO ....
+  # Basicaly, if we find this line in the log file, it means there's a segfault, so print in red KO etc...
   if grep -q "Process terminating with default action of signal 11 (SIGSEGV)" log/valgrind_output; then
     echo -e "${RED}SEGMENTATION FAULT !${NC}"
     LEAKS=1
   fi
 
-  # if there is no definitely lost or still reachable, this line appears in valgrind output
+  # if there is definitely lost or still reachable, this line appears in valgrind output
   if ! grep -q "LEAK SUMMARY" log/valgrind_output; then
     echo -e "${GREEN}NO LEAKS${NC}"
   else
@@ -236,6 +241,7 @@ EOF
     echo -e "${RED}LEAKS !${NC}"
   fi
 
+  # conditionnal jump or invalid read of size will prevent this line to appear on the valgrind output
   # Here we will have all children reports, so we need to clean first the "expected outputs" for the line "ERROR SUMMARY" and if we still find a line "ERROR SUMMARY" it can be only errors
   NB_ERR=$(grep -v "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" log/valgrind_output | grep "ERROR SUMMARY: " | wc -l)
     if [[ $NB_ERR == 0 ]]; then
@@ -245,7 +251,7 @@ EOF
     echo -e "${RED}$NB_ERR ERRORS !${NC}"
   fi
 
-  # conditionnal jump or invalid read of size will prevent this line to appear on the valgrind output
+  # This line appears if your minishell creates zombie process
   if [[ ! $(grep -q "ERROR: Some processes were left running at exit." log/valgrind_output) ]]; then
     echo -e "${GREEN}NO ZOMBIE PROCESS${NC}"
   else
@@ -253,7 +259,7 @@ EOF
     echo -e "${RED}ZOMBIE PROCESS !${NC}"
   fi
 
-  # This line is found only if there fd still open at exit in a process at least
+  # This line is found only if there is at least one fd still open at exit in a processm excluding the 3 standards ones
   if [[ $(grep -v "Open file descriptors" log/valgrind_output) ]]; then
     echo -e "${GREEN}FD CLOSED${NC}"
   else
@@ -261,11 +267,14 @@ EOF
     echo -e "${RED}FD OPEN AT EXIT !${NC}"
   fi
 
+  # if any of previous if was activated, invite user to consult the valgrind log 
   if [[ $LEAKS == 1 ]]; then
     echo -e "Full valgrind log : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
   fi
 fi
 
+
+# All following lines basicaly operate diffs and greps on the logs files, to determine if the test is passed or not
 CLEAN=$LEAKS
 
 # print result for STDOUT : a diff on the two outputfiles 
