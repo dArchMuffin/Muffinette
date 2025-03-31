@@ -203,7 +203,7 @@ while IFS= read -r INPUT; do
       OUTFILE_PERM_FLAG=$((1 - OUTFILE_PERM_FLAG))
       echo -e "${YELLOW}outfile perm = $( [[ $OUTFILE_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
       ;;
-      # after 
+      # after a test use ! and then --add-recipe to add last squence tested to recipes.sh 
     "--add-recipe")
       if [[ ${#ARGS[@]} -ne 0 ]]; then 
         echo -n 'recipes ' >> recipes.sh
@@ -228,11 +228,9 @@ while IFS= read -r INPUT; do
       #<execution>
       #<execution>
       #;;
-      # ...
-      # DO NOT override following cases ! "" and * must be the lasts
-      #
+      
       # no input : if the buffer is not empty : the sequence is sent to taster.sh
-      # if the buffer is empy : print a helper
+      # if the buffer is empty : print a helper
     "")
       if [[ ${#ARGS[@]} -eq 0 ]]; then
         echo -e "${YELLOW}No inputs recorded"
