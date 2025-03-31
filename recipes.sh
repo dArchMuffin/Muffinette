@@ -28,11 +28,8 @@ recipes "echo -e \"two eggs\"" "echo -e '100g sugar'"
 # recipes "your" "own"
 # recipes "t" "e" "s" "t" "S"
 
-#each argument is an input, use double quotes to delimate it
+# You can either add your own tests here manualy, or you can use the --add-recipe command, 
+# the sequence in buffer will be added after this linesm ready to run with ./recipes.sh or --recipes in CLI. 
 
-recipes "pwd" "cd" "ls" 
-recipes "echo \"hello\"" 
-recipes "echo \"hello\"" "ls -l" "cd .." "pwd" 
-recipes "--leaks" "ls -l" "pwd" "cd .." "pwd" "cd " 
-recipes "pwd" "cd .." "ls" "echo \"hello\"" "ls | wc -l" 
-recipes "sleep 6" 
+# I highly recommend to keep this file clean and organized by sorting tests in categories here 
+# Comments are your friends !

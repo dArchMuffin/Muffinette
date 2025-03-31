@@ -4,10 +4,14 @@ GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
 
+# This script contains all functions i need elsewhere 
+
+# this function runs the taster with the tests listed in recipes 
 recipes()
 {
   FILTERED_ARGS=()
 
+# Filtered args is only for display purpose : showing --leaks -r makes output difficult to read
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --leaks|--as|-r|--infile=*|--file1=*|--file2=*|--outfile=*)
@@ -23,7 +27,8 @@ recipes()
 
   KO=0
 
-  OUTPUT=$(timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FILTERED_ARGS[@]}") 
+# tester si les flags sont bien pris en compte 
+  OUTPUT=$(timeout "${TIMEOUT_DURATION}s" ./taster.sh "$@") 
   if [[ $? -eq 124 ]]; then
     echo -e "${FILTERED_ARGS[@]} : ${RED}TIME OUT !${NC}"
     KO=1
@@ -90,6 +95,7 @@ recipes()
   fi
 }
 
+# a user cheatshit for CLI commands 
 print_help()
 {
   echo -e "$YELLOW"
@@ -123,6 +129,7 @@ print_help()
   echo -e "$NC"
 }
 
+# --print=stdout output 
 print_stdout()
 {
   echo -e "$YELLOW"
@@ -141,6 +148,7 @@ print_stdout()
     echo -e "$NC"
 }
 
+# --print=stderr output 
 print_stderr()
 {
   echo -e "$YELLOW"
@@ -198,6 +206,7 @@ set_flags()
   fi
 }
 
+# so much flags, it needed a helper to not loose track of your tests
 print_flags()
 {
   echo -e "$YELLOW"
@@ -263,6 +272,7 @@ print_flags()
   echo -e "$NC"
 }
 
+# experimental : open terminals with bash and / or minishell to operate or see behaviors 
 spatule()
 {
   if [[ $1 == "bash" ]]; then
@@ -275,6 +285,7 @@ spatule()
   fi
 }
 
+# a virer ? 
 watch_logs() {
   case "$1" in
     "off") pgrep watch | tail -n +2 | xargs kill ;;
