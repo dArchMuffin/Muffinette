@@ -17,6 +17,20 @@ PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
 # done
 # echo ""
 
+# customize default files variables
+#infile = 1 means it exists
+INFILE=1
+#infile_perm = 1 means chmod 644
+INILE_PERM=1
+OUTFILE=1
+OUTFILE_PERM=1
+FILE1=1
+FILE1_PERM=1
+FILE2=1
+FILE2_PERM=1
+
+LEAKS_FLAG=0
+
 # comment these lines to test an empty infile, or customize for your taste
 echo -e "Some people... some people like cupcakes, exclusively... 
 while myself, I say, there is naught nor ought there be nothing
@@ -38,20 +52,6 @@ if [[ -z $1 ]]; then
   echo "No input received"
   exit 
 fi
-
-# customize default files variables
-#infile = 1 means it exists
-INFILE=1
-#infile_perm = 1 means chmod 644
-INILE_PERM=1
-OUTFILE=1
-OUTFILE_PERM=1
-FILE1=1
-FILE1_PERM=1
-FILE2=1
-FILE2_PERM=1
-
-LEAKS_FLAG=0
 
 # WORKING ON Bye default, auto-save of failed tests logs is disable, switch this variable to 1 to enable it
 # AUTO_SAVE=0
