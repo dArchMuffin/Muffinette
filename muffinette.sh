@@ -46,9 +46,8 @@ ARGS=()
 
 # As a simple CLI, i used a read in while, with a switch case. Each case corresponding to one command, or an input to 
 # add to the sequence to test if the input does not match any command
-# IFS= and -r allow user to use muffinette prompt exactly the same way we use bash or minishell
+# IFS= and -r allow user to use muffinette prompt exactly the same way he would use bash or minishell
 while IFS= read -r INPUT; do
-# using switch cases instead of elifs makes the code cleaner more lisible and easier to edit
 # see at the end of this script to add your own custom command
   case "$INPUT" in
     # the ! tests are meant to lead tests quickly, loading last sequence back and executing it with an additional option 
