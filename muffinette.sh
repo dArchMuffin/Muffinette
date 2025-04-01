@@ -1,300 +1,256 @@
 #!/bin/bash
 
-GREEN="\033[0;32m"
+# To customize this CLI yourself, see below how to edits the cmds or to implement your own command
+
+# I used yellow color to visualy separate the output of muffinette.sh and tastor.sh
+# tastor.sh prints in white, muffinette.sh prints in yellow
+YELLOW="\033[0;33m"
 RED="\033[0;31m"
 NC="\033[0m"
 
-# uncomment last line of this script to 
-# disable autoclean of the log folder
+# set -x
+
 mkdir -p log
 
-#comment to test non existing files
-touch log/outfile
-touch log/infile
+# Cookware has functions to display infos and set flags
+# customize yourself infos displayed by editing or adding a function in cookware.sh
+source cookware.sh
 
-#uncomment and tweak yourself to test permissions
-# chmod 000 log/outfile
-# chmod 000 log/infile
+# theses variables set timeout duration, valgrind check and redirection check to disable by default
+# just switch it to 1 to enable it by default, or use CLI cmds
+TIMEOUT_DURATION=5
+VALGRIND_FLAG=0
+R_FLAG=0
 
-# Edit this line and uncomment last lines of this script
-# to save failed tests in the file of your choice using its relative or absolute path:
-FAILED_TESTS_FOLDER="../failed_tests"
-# working on ..
+# Here you can enable or disable files existence or permissions by default
+INFILE_FLAG=0
+INFILE_PERM_FLAG=0
+# INFILE_FLAG = 0 means the file will be existing during tests / 1 means it will NOT exist for tests
+# INFILE_PERM_FLAG = 0 means it will be chmod 644 / 1 means chmod 000
 
-#if your STDOUT appears always KO for no reason, read the README and edit this line
-PROMPT="$(echo -e "\n" | ./minishell | awk '{print $1}' | head -1)"
+FILE1_FLAG=0
+FILE1_PERM_FLAG=0
 
-#comment these lines for a shorter output for quick tests or muff.sh full tests
-echo -e "----------| Muffinette |----------"
-echo ""
-for arg in "$@"; do
-  if [[ "$arg" != "--leaks" && "$arg" != "-r" && "$arg" != "-ra" ]]; then
-    echo -e "$PROMPT $arg"
-  fi
+FILE2_FLAG=0
+FILE2_PERM_FLAG=0
+
+OUTFILE_FLAG=0
+OUTFILE_PERM_FLAG=0
+
+# working on ...
+# AUTO_SAVE_FLAG=0
+
+echo -en "${YELLOW}[Muffinette]\$ ${NC}"
+
+ARGS=()
+
+# As a simple CLI, i used a read in while, with a switch case. Each case corresponding to one command, or an input to 
+# add to the sequence to test if the input does not match any command
+# IFS= and -r allow user to use muffinette prompt exactly the same way he would use bash or minishell
+while IFS= read -r INPUT; do
+# see at the end of this script to add your own custom command
+  case "$INPUT" in
+    # the ! tests are meant to lead tests quickly, loading last sequence back and executing it with an additional option 
+    # ! after a test, load back last sequence in buffer
+    "!")
+      ARGS=$(printf "%s\n" "${LAST_SEQ[@]}")
+      printf "${YELLOW}%s\n" "${LAST_SEQ[@]}"
+      ;;
+    # !! after a test, load back and execute last sequence
+    "!!")
+      set_flags
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
+      ;;
+    # !! after a test, load back and execute last sequence with a valgrind test
+    "!v")
+      VALGRIND_FLAG=1
+      set_flags
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
+      VALGRIND_FLAG=0
+      ;;
+    # !! after a test, load back and execute last sequence with a redirection test
+    "!>")
+      R_FLAG=1
+      set_flags
+      timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${LAST_SEQ[@]}" 2> /dev/null
+      if [[ $? -eq 124 ]]; then
+        echo -e "${RED}TIME OUT !${NC}"
+      fi
+      R_FLAG=0
+      ;;
+    # -h --help : dispaly help
+    "-h"|"--help")
+      print_help
+      ;;
+    # -bye : quit and clean
+    "bye"|"quit"|"exit")
+      pgrep watch | tail -n +2 | xargs kill 2> /dev/null
+      # if [[ ! -z log/file_without_permissions ]]; then
+      #   chmod 644 log/file_without_permissions
+      # fi
+      rm -rf log 2> /dev/null
+      exit 0
+      ;;
+    # --watch= : new tty with watch on a log file option
+    # see README for details
+    # "--auto-save")
+      # if [[ $AUTO_SAVE_FLAG == 1 ]]; then
+        # AUTO_SAVE_FLAG=0
+      # else
+        # AUTO_SAVE_FLAG=1
+      # fi
+      # ;;
+    "--muffinator")
+    # terminator -l config
+      ;;
+    # --print=* : print log file
+    "--print=stdout")
+      print_stdout
+      ;;
+    "--print=stderr")
+      print_stderr
+      ;;
+    "--print=valgrind")
+      cat log/valgrind_output
+      ;;
+    "--print=outfile")
+      cat log/outfile
+      ;;
+      # Valgrind test switch
+    "--valgrind"|"-vg")
+      VALGRIND_FLAG=$((1 - VALGRIND_FLAG))
+      echo -e "${YELLOW}valgrind_flag = $( [[ $VALGRIND_FLAG -eq 1 ]] && echo ON || echo OFF )${NC}"
+      ;;
+      # Redirection test switch
+    "- >")
+      R_FLAG=$((1 - R_FLAG))
+      echo -e "${YELLOW}> = $( [[ $R_FLAG -eq 1 ]] && echo ON || echo OFF )${NC}"
+      ;;
+      # Display flags status
+    "--print=flags"|"-pf")
+      print_flags
+      ;;
+      # Display sequence in buffer
+    "--print=seq"|"-ps")
+      printf "${YELLOW}%s\n" "${ARGS[@]}"
+      echo -e "$NC"
+      ;;
+      # Display last sequence used
+    "--print=last-seq"|"-pls")
+      printf "${YELLOW}%s\n" "${LAST_SEQ[@]}"
+      echo -e "$NC"
+      ;;
+      # run muffinette.sh with your custom tests in recipes.sh
+    "--recipes")
+      ./recipes.sh
+      ;;
+      # open a new tty with a bash shell
+    "--bash")
+      spatule "bash"
+      ;;
+      # open a new tty with a minishell shell
+    "--minishell")
+      spatule "minishell"
+      ;;
+      # open 2 tty with bash and minishell shells
+    "--spatule")
+      spatule "spatule"
+      ;;
+      # remove last input in sequence
+    "--oops"|"-o")
+      if [[ ${#ARGS[@]} -gt 0 ]]; then
+        echo -e "${YELLOW}removed : ${ARGS[-1]}${NC}"
+        unset 'ARGS[-1]'
+      fi
+      ;;
+      # This bloc sets switches for existing files and permissions
+    "--infile")
+      INFILE_FLAG=$((1 - INFILE_FLAG))
+      echo -e "${YELLOW}infile existing = $( [[ $INFILE_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--infile-perm")
+      INFILE_PERM_FLAG=$((1 - INFILE_PERM_FLAG))
+      echo -e "${YELLOW}infile perm = $( [[ $INFILE_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--file1")
+      FILE1_FLAG=$((1 - FILE1_FLAG))
+      echo -e "${YELLOW}file1 existing = $( [[ $FILE1_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--file1-perm")
+      FILE1_PERM_FLAG=$((1 - FILE1_PERM_FLAG))
+      echo -e "${YELLOW}file1 perm = $( [[ $FILE1_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--file2")
+      FILE2_FLAG=$((1 - FILE2_FLAG))
+      echo -e "${YELLOW}file2 existing = $( [[ $FILE2_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--file2-perm")
+      FILE2_PERM_FLAG=$((1 - FILE2_PERM_FLAG))
+      echo -e "${YELLOW}file2 perm = $( [[ $FILE2_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--outfile")
+      OUTFILE_FLAG=$((1 - OUTFILE_FLAG))
+      echo -e "${YELLOW}outfile existing = $( [[ $OUTFILE_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+    "--outfile-perm")
+      OUTFILE_PERM_FLAG=$((1 - OUTFILE_PERM_FLAG))
+      echo -e "${YELLOW}outfile perm = $( [[ $OUTFILE_PERM_FLAG -eq 0 ]] && echo ON || echo OFF )${NC}"
+      ;;
+      # after a test use ! and then --add-recipe to add last squence tested to recipes.sh 
+    "--add-recipe")
+      if [[ ${#ARGS[@]} -ne 0 ]]; then 
+        echo -n 'recipes ' >> recipes.sh
+        for ARG in "${ARGS[@]}"; do
+          printf '"%s" ' "$(echo "$ARG" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\$/\\$/g' -e 's/`/\\`/g')" >> recipes.sh
+        done
+        echo >> recipes.sh
+        echo -e "${YELLOW}${ARGS[@]}\nadded to recipes${NC}"
+        echo
+      else
+        echo -n 'recipes ' >> recipes.sh
+        for ARG in "${LAST_SEQ[@]}"; do
+          printf '"%s" ' "$(echo "$ARG" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\$/\\$/g' -e 's/`/\\`/g')" >> recipes.sh
+        done
+        echo >> recipes.sh
+        echo -e "${YELLOW}${LAST_SEQ[@]}\nadded to recipes${NC}"
+        echo
+      fi
+      ;;
+      # add your custom cmd here
+      #"--cmd")
+      #<execution>
+      #<execution>
+      #;;
+      
+      # no input : if the buffer is not empty : the sequence is sent to taster.sh
+      # if the buffer is empty : print a helper
+    "")
+      if [[ ${#ARGS[@]} -eq 0 ]]; then
+        echo -e "${YELLOW}No inputs recorded"
+        echo ""
+        echo "use -h or --help for usage informations${NC}"
+        print_flags
+      else
+        set_flags
+        timeout "${TIMEOUT_DURATION}s" ./taster.sh "${FLAGS[@]}" "${ARGS[@]}" 2> /dev/null
+        if [[ $? -eq 124 ]]; then
+          echo -e "${RED}TIME OUT !${NC}"
+        fi
+        LAST_SEQ=("${ARGS[@]}")
+        ARGS=()
+      fi
+      ;;
+      # Any other inputs will be considered as an input to add to the sequence to test
+    *)
+      ARGS+=("$INPUT")
+      ;;
+  esac
+  echo -en "${YELLOW}[Muffinette]\$ ${NC}"
 done
-echo ""
 
-# comment these lines to test an empty infile
-echo -e "Some people... some people like cupcakes, exclusively... 
-while myself, I say, there is naught nor ought there be nothing
-So exalted on the face of god's grey earth as that prince of foods... 
-the muffin!
-
-Franc Zappa - Muffin Man" > log/infile
-
-if [[ -z $1 ]]; then
-  echo -e "-----------------------------| Muffinette usage |-----------------------------\n"
-  echo -e "1 : Make sure to have your minishell binary in muffinette's folder"
-  echo -e "2 : Your binary must be named \"minishell\""
-  echo -e "3 : If the STDOUT test always fails for not reason, edit muffinette.sh following the README"
-  exit 
-fi
-
-LEAKS_FLAG=0
-
-if [[ $(find . -maxdepth 1 -type f -name minishell | wc -l) == 0 ]]; then
-  echo "Error : no 'minishell' binary found in current working directory"
-  exit 
-fi
-
-if [[ $1 == "--leaks" ]]; then
-  LEAKS_FLAG=1;
-  shift
-fi
-
-if [[ $1 == "-r" ]]; then
-  REDIR=1;
-  shift
-fi
-
-if [[ $1 == "-ra" ]]; then
-  REDIR_A=1;
-  shift
-fi
-
-if [[ $1 == "--clean" ]]; then
-  rm -rd log
-  exit 
-fi
-
-# Johann working on ...
-if [[ $1 == "--muffin" ]]; then
-  echo "error: bakery not implemented yet"
-  exit 
-fi
-
-# using \n as a separator to delimitate inputs in get_next_line / read of minishell / bash 
-INPUT=$(printf "%s\n" "$@")
-
-# using here_doc on minishell and bash to simulate sequences of inputs
-# rederecting stdout  
-./minishell << EOF 2> /dev/null > log/minishell_output 
-$INPUT
-EOF
-#using $? to get last exit code
-EXIT_CODE_P=$?
-
-# Since minishell prints its prompt and input these lines clean it from its output file
-# but first, PROMPT probably include special characters, sed can make it readable 
-ESCAPED_PROMPT=$(printf "%s" "$PROMPT" | sed 's/[]\/$*.^[]/\\&/g')
-
-# now we use sed to remove lines begnning with your minishell prompt
-sed -i "/^$ESCAPED_PROMPT/d" log/minishell_output
-# -i edit a file
-# ^ lines beginning with 
-# /d deletion
-
-# We execute the same test on bash to have a reference 
-bash << EOF 2> /dev/null > log/bash_output
-$INPUT
-EOF
-EXIT_CODE_B=$?
-
-# same double test for STDERR 
-./minishell << EOF 2> log/minishell_stderr > /dev/null
-$INPUT
-EOF
-
-bash << EOF 2> log/bash_stderr > /dev/null
-$INPUT
-EOF
-
-# some spicy stuff with valgrind
-if [[ $LEAKS_FLAG == 1 ]]; then
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --show-mismatched-frees=yes --track-fds=yes --trace-children=yes ./minishell << EOF 2>&1 | tee log/valgrind_output | grep -v "$PROMPT_TO_CLEAN" > /dev/null
-$INPUT
-EOF
-
-  LEAKS=0
-
-  if grep -q "Process terminating with default action of signal 11 (SIGSEGV)" log/valgrind_output; then
-    echo -e "${RED}SEGMENTATION FAULT !${NC}"
-  fi
-
-  if ! grep -q "LEAK SUMMARY" log/valgrind_output; then
-    echo -e "${GREEN}NO LEAKS${NC}"
-  else
-    LEAKS=1
-    echo -e "${RED}LEAKS !${NC}"
-  fi
-
-  NB_ERR=$(grep -v "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" log/valgrind_output | grep "ERROR SUMMARY: " | wc -l)
-    if [[ $NB_ERR == 0 ]]; then
-    echo -e "${GREEN}NO ERRORS${NC}"
-  else
-    LEAKS=1
-    echo -e "${RED}$NB_ERR ERRORS !${NC}"
-  fi
-
-  if [[ ! $(grep -q "ERROR: Some processes were left running at exit." log/valgrind_output) ]]; then
-    echo -e "${GREEN}NO ZOMBIE PROCESS${NC}"
-  else
-    LEAKS=1
-    echo -e "${RED}ZOMBIE PROCESS !${NC}"
-  fi
-
-  # changer ca
-  if [[ ! $(grep -v "FILE DESCRIPTORS: 3 open (3 std) at exit." log/valgrind_output | grep -q "FILES DESCRIPTORS") ]]; then
-    echo -e "${GREEN}FD CLOSED${NC}"
-  else
-    LEAKS=1
-    echo -e "${RED}FD OPEN AT EXIT !${NC}"
-  fi
-
-  if [[ $LEAKS == 1 ]]; then
-    echo -e "Full valgrind log : \e]8;;file://$(pwd)/log/valgrind_output\alog/valgrind_output\e]8;;\a"
-  fi
-fi
-
-CLEAN=0
-
-# print result for STDOUT
-if diff -q log/minishell_output log/bash_output > /dev/null; then
-  echo -e "STDOUT : ${GREEN}OK${NC}"
-else
-  echo -e "STDOUT : ${RED}KO${NC}"
-  CLEAN=1
-  diff log/minishell_output log/bash_output
-fi
-
-ERROR_MISSING=0
-
-# checking stderr error management
-if [[ $(grep -i "command not found" log/bash_stderr | wc -l) != $(grep -i "command not found" log/minishell_stderr | wc -l) ]]; then
-  ERROR_MISSING=1
-fi
-if [[ $(grep -i "Permission denied" log/bash_stderr | wc -l) != $(grep -i "Permission denied" log/minishell_stderr | wc -l) ]]; then
-  ERROR_MISSING=1
-fi
-if [[ $(grep -i "Is a directory" log/bash_stderr | wc -l) != $(grep -i "Is a directory" log/minishell_stderr | wc -l) ]]; then
-  ERROR_MISSING=1
-fi
-if [[ $(grep -i "No such file or directory" log/bash_stderr | wc -l) != $(grep -i "No such file or directory" log/minishell_stderr | wc -l) ]]; then
-  ERROR_MISSING=1
-fi
-# //too many files open
-if [[ $ERROR_MISSING != 0 ]]; then
-  CLEAN = 1
-fi
-
-if [[ $ERROR_MISSING == 0 ]] ; then
-  echo -e "STDERR : ${GREEN}OK${NC}"
-else
-  echo -e "STDERR : ${RED}KO${NC} : diff log/bash_stderr log/minishell_stderr"
-  CLEAN=1
-fi
-
-# comparing exit code
-if [[ "$EXIT_CODE_P" -ne "$EXIT_CODE_B" ]]; then
-  echo -e "EXIT : ${RED}KO${NC}"
-  echo -e "bash : $EXIT_CODE_B\nminishell: $EXIT_CODE_P"
-  CLEAN=1
-else
-  echo -e "EXIT : ${GREEN}OK${NC}"
-fi
-
-# Option redirection
-if [[ $REDIR == 1 ]]; then
-./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/outfile > /dev/null
-$INPUT
-EOF
-
-  MINISHELL_OUTFILE=$(<log/outfile)
-
-bash << EOF > log/outfile > /dev/null
-$INPUT
-EOF
-
-  BASH_OUTFILE=$(<log/outfile)
-
-  if diff -q "$MINISHELL_OUTFILE" "$BASH_OUTFILE" > /dev/null 2>/dev/null; then
-    echo -e "REDIR > : ${RED}KO${NC}"
-    diff $MINISHELL_OUTFILE $BASH_OUTFILE
-    echo -e "minishell output : \n"
-    echo -e $MINISHELL_OUTFILE > log/outfile
-    echo -e "bash output : \n"
-    echo -e $BASH_OUTFILE >> log/outfile
-    $CLEAN = 1
-  else
-    echo -e "REDIR > : ${GREEN}OK${NC}"
-  fi
-fi
-
-# option redirection with append
-if [[ $REDIR_A == 1 ]]; then
-./minishell << EOF | grep -v "$PROMPT_TO_CLEAN" > log/outfile > /dev/null
-$INPUT
-EOF
-
-  MINISHELL_OUTFILE=$(<log/outfile)
-
-bash << EOF > log/outfile > /dev/null
-$INPUT
-EOF
-
-  BASH_OUTFILE=$(<log/outfile)
-
-  if diff -q "$MINISHELL_OUTFILE" "$BASH_OUTFILE" > /dev/null 2>/dev/null; then
-    echo -e "REDIR >> : ${RED}KO${NC}"
-    diff $MINISHELL_OUTFILE $BASH_OUTFILE
-    echo -e "minishell output : \n"
-    echo -e $MINISHELL_OUTFILE > log/outfile
-    echo -e "bash output : \n"
-    echo -e $BASH_OUTFILE >> log/outfile
-    $CLEAN = 1
-  else
-    echo -e "REDIR >> : ${GREEN}OK${NC}"
-  fi
-fi
-
-
-# working on
-# uncomment these lines and edit FAILED_TESTS_FOLDER to save your logs
-# if [[ $CLEAN == 1 ]]; then
-#   FAILED_TEST="Muffinette_failed_test_$(date +"%Y-%m-%d_%H-%M-%S")"
-#   mkdir $FAILED_TESTS_FOLDER/$FAILED_TEST
-#   echo -e "----------| Muffinette |----------" > "$FAILED_TESTS_FOLDER\/$FAILED_TEST\/input" 
-#   echo -e "" >> $FAILED_TESTS_FOLDER\/$FAILED_TEST\/input
-#   for arg in "$@"; do
-#     if [[ "$arg" != "--leaks" && "$arg" != "-r" && "$arg" != "-ra" ]]; then
-#       echo -e "$PROMPT $arg" >> $FAILED_TESTS_FOLDER\/$FAILED_TEST\/input
-#     fi
-#   done
-#   cp log/* $FAILED_TESTS_FOLDER/$FAILED_TEST/
-# fi
-
-# comment to disable autoclean of log folder
-if [[ $CLEAN == 0 ]]; then
-  rm -rd log
-fi
-
-#experimenting
-# kitty --detach bash -c "cat << EOF | ./minishell 2>/dev/null 
-# $INPUT
-# EOF
-# read"
-#
-# kitty --detach bash -c "cat << EOF | bash 2>/dev/null
-# $INPUT
-# EOF
-# read"

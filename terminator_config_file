@@ -1,0 +1,155 @@
+[global_config]
+  title_transmit_bg_color = "#d30102"
+  inactive_color_offset = 1.0
+  enabled_plugins = CustomCommandsMenu, LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  suppress_multiple_term_dialog = True
+  title_use_system_font = False
+  title_font = Sans 14
+[keybindings]
+[profiles]
+  [[default]]
+    cursor_color = "#aaaaaa"
+[layouts]
+  [[default]]
+    [[[child0]]]
+      type = Terminal
+      parent = window0
+    [[[window0]]]
+      type = Window
+      parent = ""
+      size = 1000, 600
+  [[custom_layout]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+      size = 1600, 900
+      position = 0:0
+      [[[[child0]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/minishell_output
+      [[[[child1]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/bash_output
+      [[[[child2]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/minishell_stderr
+      [[[[child3]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/bash_stderr
+      [[[[child4]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/valgrind_output
+      [[[[child5]]]]
+        type = Terminal
+        parent = window0
+        profile = default
+        command = watch -n1 cat log/outfile
+  [[muffinette_watch]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 0:32
+      maximised = True
+      fullscreen = False
+      size = 3840, 2128
+      title = watch -n1 cat log/minishell_output
+      last_active_term = 7956a383-bf08-40f8-899c-17eebf6156b0
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 524
+      ratio = 0.13663624511082137
+    [[[terminal2]]]
+      type = Terminal
+      parent = child1
+      order = 0
+      profile = default
+      uuid = 7dc182f2-32f5-4c0e-94e6-1280adc569e0
+      command = ./muffinette.sh
+    [[[child3]]]
+      type = VPaned
+      parent = child1
+      order = 1
+      position = 1062
+      ratio = 0.5002355157795573
+    [[[child4]]]
+      type = HPaned
+      parent = child3
+      order = 0
+      position = 1653
+      ratio = 0.5
+    [[[terminal5]]]
+      type = Terminal
+      parent = child4
+      order = 0
+      profile = default
+      uuid = 7956a383-bf08-40f8-899c-17eebf6156b0
+      command = watch -n1 cat log/minishell_output
+    [[[terminal6]]]
+      type = Terminal
+      parent = child4
+      order = 1
+      profile = default
+      uuid = 3afb231d-fe2f-4cda-9213-e0d7494030a2
+      command = watch -n1 cat log/bash_output
+    [[[child7]]]
+      type = HPaned
+      parent = child3
+      order = 1
+      position = 1653
+      ratio = 0.5
+    [[[child8]]]
+      type = VPaned
+      parent = child7
+      order = 0
+      position = 528
+      ratio = 0.5
+    [[[terminal9]]]
+      type = Terminal
+      parent = child8
+      order = 0
+      profile = default
+      uuid = 3c3071be-1f9e-40e5-a961-53af8ccafea1
+      command = watch -n1 cat log/minishell_stderr
+    [[[terminal10]]]
+      type = Terminal
+      parent = child8
+      order = 1
+      profile = default
+      uuid = d84abc12-8fef-44d7-a40a-f231b51924bf
+      command = watch -n1 cat log/valgrind_output
+    [[[child11]]]
+      type = VPaned
+      parent = child7
+      order = 1
+      position = 528
+      ratio = 0.5
+    [[[terminal12]]]
+      type = Terminal
+      parent = child11
+      order = 0
+      profile = default
+      uuid = 0d812bad-4729-463c-8e46-91307e7e8e16
+      command = watch -n1 cat log/bash_stderr
+    [[[terminal13]]]
+      type = Terminal
+      parent = child11
+      order = 1
+      profile = default
+      uuid = 4253b5bb-0cbe-4c2d-9f78-7e610191b44d
+      command = watch -n1 cat log/outfile
+      font = Monospace 24
+[plugins]
