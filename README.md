@@ -252,6 +252,9 @@ If you don't trust the taster.sh, you can still overview by yourself all log fil
 
 1. Make sure to have terminator and watch installed
 2. copy the terminator config file provided in the repo in .config/terminator/config
+```bash
+cp terminator_config_file $HOME/.config/terminator/config
+```
 3. run `./muffinette --muffinator` or `[Muffinette]$ --muffinator`
 
 To operate or experiment with bash or minishell, `[Muffinette]$ --bash` or `[Muffinette]$ --minishell` Opens a new terminal with a bash or minishell directly from muffinette.

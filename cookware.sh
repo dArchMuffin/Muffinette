@@ -290,40 +290,38 @@ print_flags()
   echo -e "$NC"
 }
 
-# experimental : open terminals with bash and / or minishell to operate or see behaviors 
 spatule()
 {
   if [[ $1 == "bash" ]]; then
-    kitty --detach bash -c "bash" &
+    terminator  -e "bash" &
   elif [[ $1 == "minishell" ]]; then
-    kitty --detach bash -c "./minishell" &
+    terminator -e "./minishell" &
   elif [[ $1 == "spatule" ]]; then
-    kitty --detach bash -c "bash" &
-    kitty --detach bash -c "./minishell" &
+    terminator  -e "bash" &
+    terminator  -e "./minishell" &
   fi
 }
 
-# a virer ? 
 watch_logs() {
   case "$1" in
     "off") pgrep watch | tail -n +2 | xargs kill ;;
     "all")
-      kitty --detach bash -c 'watch -n1 cat log/minishell_output'
-      kitty --detach bash -c 'watch -n1 cat log/bash_output'
-      kitty --detach bash -c 'watch -n1 cat log/minishell_stderr'
-      kitty --detach bash -c 'watch -n1 cat log/bash_stderr'
-      kitty --detach bash -c 'watch -n1 cat log/valgrind_output'
-      kitty --detach bash -c 'watch -n1 cat log/outfile' ;;
+      terminator --new-tab -e 'watch -n1 cat log/minishell_output'
+      terminator --new-tab -e 'watch -n1 cat log/bash_output'
+      terminator --new-tab -e 'watch -n1 cat log/minishell_stderr'
+      terminator --new-tab -e 'watch -n1 cat log/bash_stderr'
+      terminator --new-tab -e 'watch -n1 cat log/valgrind_output'
+      terminator --new-tab -e 'watch -n1 cat log/outfile' ;;
     "stdout")
-      kitty --detach bash -c 'watch -n1 cat log/minishell_output'
-      kitty --detach bash -c 'watch -n1 cat log/bash_output' ;;
+      terminator --new-tab -e 'watch -n1 cat log/minishell_output'
+      terminator --new-tab -e 'watch -n1 cat log/bash_output' ;;
     "stderr")
-      kitty --detach bash -c 'watch -n1 cat log/minishell_stderr'
-      kitty --detach bash -c 'watch -n1 cat log/bash_stderr' ;;
+      terminator --new-tab -e 'watch -n1 cat log/minishell_stderr'
+      terminator --new-tab -e 'watch -n1 cat log/bash_stderr' ;;
     "valgrind")
-      kitty --detach bash -c 'watch -n1 cat log/valgrind_output' ;;
+      terminator --new-tab -e 'watch -n1 cat log/valgrind_output' ;;
     "outfile")
-      kitty --detach bash -c 'watch -n1 cat log/outfile' ;;
+      terminator --new-tab -e 'watch -n1 cat log/outfile' ;;
   esac
 }
 
