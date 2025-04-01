@@ -8,6 +8,7 @@ YELLOW="\033[0;33m"
 RED="\033[0;31m"
 NC="\033[0m"
 
+# Uncomment this line to help debugging
 # set -x
 
 mkdir -p log
@@ -39,6 +40,17 @@ OUTFILE_PERM_FLAG=0
 
 # working on ...
 # AUTO_SAVE_FLAG=0
+
+if [[ $1 == "--muffinator" ]]; then
+  touch log/outfile
+  touch log/minishell_output
+  touch log/bash_output
+  touch log/minishell_stderr
+  touch log/bash_stderr
+  touch log/valgrind_output
+  terminator -l muffinette_watch & 2> /dev/null
+  exit 0
+fi
 
 echo -en "${YELLOW}[Muffinette]\$ ${NC}"
 
@@ -91,6 +103,7 @@ while IFS= read -r INPUT; do
     # -bye : quit and clean
     "bye"|"quit"|"exit")
       pgrep watch | tail -n +2 | xargs kill 2> /dev/null
+      # pkill -f "muffinette.sh" 2> /dev/null
       # if [[ ! -z log/file_without_permissions ]]; then
       #   chmod 644 log/file_without_permissions
       # fi
@@ -107,7 +120,7 @@ while IFS= read -r INPUT; do
       # fi
       # ;;
     "--muffinator")
-    # terminator -l config
+      terminator -l muffinette_watch & 2> /dev/null
       ;;
     # --print=* : print log file
     "--print=stdout")
